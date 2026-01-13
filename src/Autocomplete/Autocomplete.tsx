@@ -21,13 +21,17 @@ export const Autocomplete: React.FC<Props> = ({
 
   useEffect(() => {
     timerId.current = window.setTimeout(() => {
-      setAppliedQuery(query);
+      const trimmedQuery = query.trim();
+
+      if (trimmedQuery !== appliedQuery) {
+        setAppliedQuery(trimmedQuery);
+      }
     }, delay);
 
     return () => {
       clearTimeout(timerId.current);
     };
-  }, [query, delay]);
+  }, [query, delay, appliedQuery]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
