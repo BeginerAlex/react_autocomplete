@@ -17,6 +17,8 @@ export const Autocomplete: React.FC<Props> = ({
   const [appliedQuery, setAppliedQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
 
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     timerId.current = window.setTimeout(() => {
       setAppliedQuery(query);
@@ -26,6 +28,23 @@ export const Autocomplete: React.FC<Props> = ({
       clearTimeout(timerId.current);
     };
   }, [query, delay]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const handleQueryChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
@@ -51,7 +70,7 @@ export const Autocomplete: React.FC<Props> = ({
   }, [people, appliedQuery]);
 
   return (
-    <div className={`dropdown ${isOpen ? 'is-active' : ''}`}>
+    <div className={`dropdown ${isOpen ? 'is-active' : ''}`} ref={dropdownRef}>
       <div className="dropdown-trigger">
         <input
           type="text"
@@ -61,7 +80,6 @@ export const Autocomplete: React.FC<Props> = ({
           placeholder="Enter a part of the name"
           onChange={handleQueryChange}
           onFocus={() => setIsOpen(true)}
-          onBlur={() => setIsOpen(false)}
         />
       </div>
 
